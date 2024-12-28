@@ -297,10 +297,6 @@
         renderGraph(levels.level, levels.focus, levels.drive, levels.heartleft, levels.biteleft);
     }
 
-    function addKnobListeners(knobKey) {
-        const knob = knobs[knobKey];
-        const { element, pointerId, positions } = knob;
-
 function addKnobListeners(knobKey) {
     const knob = knobs[knobKey];
     const { element, pointerId, positions } = knob;
@@ -336,24 +332,23 @@ function addKnobListeners(knobKey) {
     // Add event listeners for mouse and touch
     element.addEventListener("mousedown", startEvent);
     element.addEventListener("touchstart", startEvent, { passive: false }); // Passive false to prevent scrolling
+
+    // Scroll wheel functionality
+    element.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        const delta = event.deltaY > 0 ? -5 : 5; // Scroll direction adjusts knob
+        const deltaAngle = delta * (270 / 100); // Map delta to angle
+        updateKnob(knob, deltaAngle, pointerId, positions, (angle) => (knob.angle = angle));
+    });
 }
 
-        // Scroll wheel functionality
-        element.addEventListener("wheel", (event) => {
-            event.preventDefault();
-            const delta = event.deltaY > 0 ? -5 : 5; // Scroll direction adjusts knob
-            const deltaAngle = delta * (270 / 100); // Map delta to angle
-            updateKnob(knob, deltaAngle, pointerId, positions, (angle) => (knob.angle = angle));
-        });
-    }
+// Add event listeners to all knobs
+Object.keys(knobs).forEach(addKnobListeners);
 
-    // Add event listeners to all knobs
-    Object.keys(knobs).forEach(addKnobListeners);
-
-    // Initialize pointers
-    Object.keys(knobs).forEach((key) => {
-        updatePointer(knobs[key].pointerId, knobs[key].angle);
-    });
+// Initialize pointers
+Object.keys(knobs).forEach((key) => {
+    updatePointer(knobs[key].pointerId, knobs[key].angle);
+});
 
     // Initialize graph
     renderGraph(50, 50, 50, 50, 50);
